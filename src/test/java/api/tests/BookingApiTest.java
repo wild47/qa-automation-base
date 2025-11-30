@@ -13,11 +13,13 @@ import io.qameta.allure.*;
 import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ public class BookingApiTest {
     private static AuthenticateSteps authHelper;
     private static BookingSteps bookingHelper;
     private static Random rn;
+    private final List<Integer> createdBookingIds = new ArrayList<>();
 
     @BeforeAll
     public static void setUp() {
@@ -47,9 +50,22 @@ public class BookingApiTest {
         authHelper.authenticate(username, password);
     }
 
+    @AfterEach
+    public void tearDown() {
+        for (Integer bookingId : createdBookingIds) {
+            try {
+                bookingHelper.deleteBooking(bookingId);
+            } catch (Exception e) {
+                // Booking might already be deleted or not exist, continue with cleanup
+            }
+        }
+        createdBookingIds.clear();
+    }
+
     private Integer createAngGetBookingId() {
         Booking booking = TestDataBuilder.createDefaultBooking();
         BookingResponse bookingResponse = bookingHelper.createBooking(booking);
+        createdBookingIds.add(bookingResponse.getBookingId());
         return bookingResponse.getBookingId();
     }
 
@@ -64,6 +80,7 @@ public class BookingApiTest {
         Booking booking = TestDataBuilder.createBooking(firstName, lastName, price);
 
         BookingResponse bookingResponse = bookingHelper.createBooking(booking);
+        createdBookingIds.add(bookingResponse.getBookingId());
 
         assertThat(bookingResponse)
                 .as("Booking response should not be null")
@@ -90,7 +107,6 @@ public class BookingApiTest {
                 .as("Deposit paid should match")
                 .isEqualTo(booking.getDepositPaid());
 
-        bookingHelper.deleteBooking(bookingResponse.getBookingId());
         Allure.parameter("Created Booking ID", bookingResponse.getBookingId());
     }
 
@@ -121,8 +137,6 @@ public class BookingApiTest {
         assertThat(retrievedBooking.getLastName())
                 .as("Lastname should match")
                 .isEqualTo("Doe");
-
-        bookingHelper.deleteBooking(bookingId);
     }
 
     @Test
@@ -157,8 +171,6 @@ public class BookingApiTest {
         assertThat(returnedBooking.getTotalPrice())
                 .as("Updated price should match")
                 .isEqualTo(updatedBooking.getTotalPrice());
-
-        bookingHelper.deleteBooking(bookingId);
     }
 
     @Test
@@ -194,8 +206,6 @@ public class BookingApiTest {
         assertThat(updatedBooking.getTotalPrice())
                 .as("Partially updated price should match")
                 .isEqualTo(price);
-
-        bookingHelper.deleteBooking(bookingId);
     }
 
     @Test
@@ -253,6 +263,7 @@ public class BookingApiTest {
         int price = rn.nextInt(3);
         Booking booking = TestDataBuilder.createBooking(firstName, lastName, price);
         BookingResponse created = bookingHelper.createBooking(booking);
+        createdBookingIds.add(created.getBookingId());
 
         Response response = bookingHelper.getBookingsByFirstName(firstName);
 
@@ -276,8 +287,6 @@ public class BookingApiTest {
                     .extracting(BookingId::getBookingId)
                     .contains(created.getBookingId());
         }
-
-        bookingHelper.deleteBooking(created.getBookingId());
     }
 
     @Test
@@ -290,6 +299,7 @@ public class BookingApiTest {
         int price = rn.nextInt(3);
         Booking booking = TestDataBuilder.createBooking(firstName, lastName, price);
         BookingResponse created = bookingHelper.createBooking(booking);
+        createdBookingIds.add(created.getBookingId());
 
         Response response = bookingHelper.getBookingsByLastName(lastName);
 
@@ -306,8 +316,6 @@ public class BookingApiTest {
         assertThat(bookings)
                 .as("Filtered bookings should not be null")
                 .isNotNull();
-
-        bookingHelper.deleteBooking(created.getBookingId());
     }
 
     @Test
@@ -332,6 +340,7 @@ public class BookingApiTest {
         int price = rn.nextInt(3);
         Booking booking = TestDataBuilder.createDefaultBooking();
         BookingResponse created = bookingHelper.createBooking(booking);
+        createdBookingIds.add(created.getBookingId());
 
         Booking updatedBooking = TestDataBuilder.createBooking(firstName, lastName, price);
         Response response = bookingHelper.updateBookingWithoutToken(created.getBookingId(), updatedBooking);
@@ -339,8 +348,6 @@ public class BookingApiTest {
         assertThat(response.getStatusCode())
                 .as("Status code should be 403 without auth token")
                 .isEqualTo(403);
-
-        bookingHelper.deleteBooking(created.getBookingId());
     }
 
     @Test
@@ -350,7 +357,8 @@ public class BookingApiTest {
     public void testBookingResponseSchema() {
         Booking booking = TestDataBuilder.createDefaultBooking();
 
-        bookingHelper.createBooking(booking);
+        BookingResponse bookingResponse = bookingHelper.createBooking(booking);
+        createdBookingIds.add(bookingResponse.getBookingId());
 
         Response response = bookingHelper.getAllBookings();
         response.then()
@@ -379,6 +387,7 @@ public class BookingApiTest {
 
         BookingResponse bookingResponse = bookingHelper.createBooking(booking);
 
+        createdBookingIds.add(bookingResponse.getBookingId());
         assertThat(bookingResponse)
                 .as("Booking should be created successfully with valid date format")
                 .isNotNull();
@@ -389,7 +398,6 @@ public class BookingApiTest {
                 .as("Check-out date should match yyyy-MM-dd format")
                 .matches("\\d{4}-\\d{2}-\\d{2}");
 
-        bookingHelper.deleteBooking(bookingResponse.getBookingId());
     }
 
     @Test
@@ -418,8 +426,13 @@ public class BookingApiTest {
                 .post("/booking");
 
         assertThat(response.getStatusCode())
-                .as("Should accept booking even with checkout before checkin (API quirk)")
+                .as("Should accept booking even with checkout before checkin")
                 .isEqualTo(200);
+
+        if (response.getStatusCode() == 200) {
+            BookingResponse bookingResponse = response.as(BookingResponse.class);
+            createdBookingIds.add(bookingResponse.getBookingId());
+        }
     }
 
     @Test
@@ -443,13 +456,12 @@ public class BookingApiTest {
 
         BookingResponse bookingResponse = bookingHelper.createBooking(booking);
 
+        createdBookingIds.add(bookingResponse.getBookingId());
         assertThat(bookingResponse)
                 .as("Booking should be created with same dates")
                 .isNotNull();
         assertThat(bookingResponse.getBooking().getBookingDates().getCheckIn())
                 .as("Check in and check out should be the same")
                 .isEqualTo(bookingResponse.getBooking().getBookingDates().getCheckOut());
-
-        bookingHelper.deleteBooking(bookingResponse.getBookingId());
     }
 }
