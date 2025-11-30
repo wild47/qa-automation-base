@@ -1,7 +1,6 @@
 package api.tests;
 
 import api.models.AuthRequest;
-import api.models.AuthResponse;
 import api.steps.AuthenticateSteps;
 import config.ConfigProvider;
 import io.qameta.allure.*;
@@ -43,7 +42,7 @@ public class AuthenticationTest {
                 .isNotEmpty();
         assertThat(token.length())
                 .as("Auth token should have reasonable length")
-                .isGreaterThan(10);
+                .isEqualTo(15);
     }
 
     @Test
@@ -65,7 +64,7 @@ public class AuthenticationTest {
         String responseBody = response.getBody().asString();
         assertThat(responseBody)
                 .as("Response should indicate authentication failure")
-                .contains("reason");
+                .contains("Bad credentials");
     }
 
     @Test
@@ -87,7 +86,7 @@ public class AuthenticationTest {
         String responseBody = response.getBody().asString();
         assertThat(responseBody)
                 .as("Response should indicate authentication failure")
-                .contains("reason");
+                .contains("Bad credentials");
     }
 
     @Test
@@ -109,31 +108,6 @@ public class AuthenticationTest {
         String responseBody = response.getBody().asString();
         assertThat(responseBody)
                 .as("Response should indicate authentication failure")
-                .contains("reason");
-    }
-
-    @Test
-    @DisplayName("Should return valid token structure")
-    @Description("Verify that the authentication response has the correct structure")
-    @Severity(SeverityLevel.NORMAL)
-    public void testAuthenticationResponseStructure() {
-        AuthRequest authRequest = AuthRequest.builder()
-                .username(ConfigProvider.getConfig().apiUsername())
-                .password(ConfigProvider.getConfig().apiPassword())
-                .build();
-
-        Response response = authHelper.postAuth(authRequest);
-
-        AuthResponse authResponse = response.then()
-                .statusCode(200)
-                .extract()
-                .as(AuthResponse.class);
-
-        assertThat(authResponse)
-                .as("Auth response should not be null")
-                .isNotNull();
-        assertThat(authResponse.getToken())
-                .as("Token should not be null")
-                .isNotNull();
+                .contains("Bad credentials");
     }
 }

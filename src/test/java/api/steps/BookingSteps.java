@@ -16,7 +16,7 @@ public class BookingSteps {
     @Step("Create booking")
     public BookingResponse createBooking(Booking booking) {
         Response response = given()
-                .spec(getBaseSpec())
+                .spec(getAuthSpec())
                 .body(booking)
                 .when()
                 .post(BOOKING_ENDPOINT);
@@ -57,24 +57,6 @@ public class BookingSteps {
         return given()
                 .spec(getBaseSpec())
                 .queryParam("lastname", lastname)
-                .when()
-                .get(BOOKING_ENDPOINT);
-    }
-
-    @Step("Get bookings by check-in date: {checkin}")
-    public Response getBookingsByCheckIn(String checkin) {
-        return given()
-                .spec(getBaseSpec())
-                .queryParam("checkin", checkin)
-                .when()
-                .get(BOOKING_ENDPOINT);
-    }
-
-    @Step("Get bookings by checkout date: {checkout}")
-    public Response getBookingsByCheckout(String checkout) {
-        return given()
-                .spec(getBaseSpec())
-                .queryParam("checkout", checkout)
                 .when()
                 .get(BOOKING_ENDPOINT);
     }

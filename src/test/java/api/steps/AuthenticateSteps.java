@@ -14,7 +14,7 @@ import static io.restassured.RestAssured.given;
 public class AuthenticateSteps {
 
     private static final String AUTH_ENDPOINT = "/auth";
-    private static String authToken;
+    private static final ThreadLocal<String> authToken = new ThreadLocal<>();
 
     @Step("Authenticate user")
     public String authenticate(String username, String password) {
@@ -35,14 +35,14 @@ public class AuthenticateSteps {
                 .extract()
                 .as(AuthResponse.class);
 
-        authToken = authResponse.getToken();
-        log.info("Received token: {}", authToken);
-        return authToken;
+        authToken.set(authResponse.getToken());
+        log.info("Received token: {}", authToken.get());
+        return authToken.get();
     }
 
     public static RequestSpecification getAuthSpec() {
         return getBaseSpec()
-                .cookie("token", authToken);
+                .cookie("token", authToken.get());
     }
 
     @Step("Post authentication request")

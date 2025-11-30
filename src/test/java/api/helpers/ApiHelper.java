@@ -17,7 +17,6 @@ public class ApiHelper {
         return new RequestSpecBuilder()
                 .setBaseUri(BASE_URL)
                 .setContentType(ContentType.JSON)
-                .setAccept(ContentType.JSON)
                 .addFilter(new AllureRestAssured())
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
                 .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
