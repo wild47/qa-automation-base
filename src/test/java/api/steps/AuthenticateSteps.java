@@ -5,18 +5,16 @@ import api.models.AuthResponse;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import static api.helpers.ApiHelper.getBaseSpec;
 import static io.restassured.RestAssured.given;
 
 @Slf4j
-@UtilityClass
 public class AuthenticateSteps {
 
     private static final String AUTH_ENDPOINT = "/auth";
-    private String authToken;
+    private static String authToken;
 
     @Step("Authenticate user")
     public String authenticate(String username, String password) {
@@ -45,5 +43,14 @@ public class AuthenticateSteps {
     public static RequestSpecification getAuthSpec() {
         return getBaseSpec()
                 .cookie("token", authToken);
+    }
+
+    @Step("Post authentication request")
+    public Response postAuth(AuthRequest authRequest) {
+        return given()
+                .spec(getBaseSpec())
+                .body(authRequest)
+                .when()
+                .post(AUTH_ENDPOINT);
     }
 }

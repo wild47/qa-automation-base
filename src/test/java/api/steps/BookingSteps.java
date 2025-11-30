@@ -44,7 +44,7 @@ public class BookingSteps {
     }
 
     @Step("Get bookings by firstname: {firstname}")
-    public Response getBookingsByFirstname(String firstname) {
+    public Response getBookingsByFirstName(String firstname) {
         return given()
                 .spec(getBaseSpec())
                 .queryParam("firstname", firstname)
@@ -53,7 +53,7 @@ public class BookingSteps {
     }
 
     @Step("Get bookings by lastname: {lastname}")
-    public Response getBookingsByLastname(String lastname) {
+    public Response getBookingsByLastName(String lastname) {
         return given()
                 .spec(getBaseSpec())
                 .queryParam("lastname", lastname)
@@ -62,7 +62,7 @@ public class BookingSteps {
     }
 
     @Step("Get bookings by check-in date: {checkin}")
-    public Response getBookingsByCheckin(String checkin) {
+    public Response getBookingsByCheckIn(String checkin) {
         return given()
                 .spec(getBaseSpec())
                 .queryParam("checkin", checkin)
