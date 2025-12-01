@@ -10,6 +10,11 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -96,77 +101,3 @@ jobs:
           name: screenshots-${{ matrix.test-suite.tag }}
           path: build/reports/tests/
           retention-days: 7
-
-  test-all:
-    runs-on: ubuntu-latest
-    name: "All Tests"
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
-
-      - name: Run all tests
-        run: mvn clean test -Dui.headless=true -Dtest.parallel.threads=4
-        continue-on-error: true
-
-      - name: Get Allure history
-        if: always()
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages
-        continue-on-error: true
-
-      - name: Copy Allure history
-        if: always()
-        run: |
-          mkdir -p target/allure-results/history
-          if [ -d "gh-pages/all-tests/history" ]; then
-            cp -r gh-pages/all-tests/history/* target/allure-results/history/
-          fi
-        continue-on-error: true
-
-      - name: Generate Allure report
-        if: always()
-        run: mvn allure:report
-
-      - name: Publish Allure report to GitHub Pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: target/allure-report
-          destination_dir: all-tests
-          keep_files: false
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results-all
-          path: |
-            target/allure-results/
-            target/surefire-reports/
-          retention-days: 30
-
-      - name: Test summary
-        if: always()
-        run: |
-          echo "## Test Execution Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Test Results" >> $GITHUB_STEP_SUMMARY
-          mvn surefire-report:report-only
-          echo "Check the Allure report for detailed results" >> $GITHUB_STEP_SUMMARY
