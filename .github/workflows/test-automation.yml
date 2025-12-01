@@ -52,7 +52,7 @@ jobs:
       - name: Run ${{ matrix.test-suite.name }}
         run: mvn clean test -Dgroups=${{ matrix.test-suite.tag }} -Dui.headless=true -Dui.timeout=30000 -Dselenide.pageLoadTimeout=30000
         continue-on-error: true
-        timeout-minutes: 20
+        timeout-minutes: 3
 
       - name: Get Allure history
         if: always()

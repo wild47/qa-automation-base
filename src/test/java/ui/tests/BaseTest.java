@@ -33,6 +33,20 @@ public abstract class BaseTest {
         Configuration.reopenBrowserOnFail = false;
         Configuration.fastSetValue = false;
 
+        if (Configuration.headless) {
+            Configuration.browserCapabilities.setCapability("goog:chromeOptions",
+                java.util.Map.of("args", java.util.List.of(
+                    "--headless",
+                    "--no-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--disable-extensions",
+                    "--disable-blink-features=AutomationControlled",
+                    "--window-size=1920,1080"
+                ))
+            );
+        }
+
         // Add Allure listener for Selenide
         SelenideLogger.addListener("AllureSelenide",
                 new AllureSelenide()
