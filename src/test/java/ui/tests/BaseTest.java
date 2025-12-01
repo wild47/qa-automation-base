@@ -16,12 +16,22 @@ public abstract class BaseTest {
         // Configure Selenide from config.properties
         Configuration.browser = ConfigProvider.getConfig().browser();
         Configuration.headless = ConfigProvider.getConfig().headless();
-        Configuration.timeout = ConfigProvider.getConfig().timeout();
+
+        Configuration.timeout = System.getProperty("ui.timeout") != null
+            ? Integer.parseInt(System.getProperty("ui.timeout"))
+            : ConfigProvider.getConfig().timeout();
+
         Configuration.baseUrl = ConfigProvider.getConfig().uiBaseUrl();
-        Configuration.pageLoadTimeout = 30000;
+
+        Configuration.pageLoadTimeout = System.getProperty("selenide.pageLoadTimeout") != null
+            ? Integer.parseInt(System.getProperty("selenide.pageLoadTimeout"))
+            : 30000;
+
         Configuration.browserSize = "1920x1080";
         Configuration.screenshots = ConfigProvider.getConfig().screenshotsOnFailure();
         Configuration.savePageSource = false;
+        Configuration.reopenBrowserOnFail = false;
+        Configuration.fastSetValue = false;
 
         // Add Allure listener for Selenide
         SelenideLogger.addListener("AllureSelenide",
