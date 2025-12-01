@@ -113,6 +113,13 @@ public class WebTablePage extends BasePage {
         return this;
     }
 
+    @Step("Update salary to: {newSalary}")
+    public WebTablePage updateSalary(String newSalary) {
+        salaryInput.clear();
+        salaryInput.setValue(newSalary);
+        return this;
+    }
+
     @Step("Delete record with email: {email}")
     public WebTablePage deleteRecord(String email) {
         String deleteButtonXpath = String.format("//div[text()='%s']/parent::div/parent::div//span[@title='Delete']", email);

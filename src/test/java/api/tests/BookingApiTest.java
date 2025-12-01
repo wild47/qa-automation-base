@@ -36,14 +36,14 @@ public class BookingApiTest {
 
     private static AuthenticateSteps authHelper;
     private static BookingSteps bookingHelper;
-    private static Random rn;
+    private static Random random;
     private final List<Integer> createdBookingIds = new ArrayList<>();
 
     @BeforeAll
     public static void setUp() {
         authHelper = new AuthenticateSteps();
         bookingHelper = new BookingSteps();
-        rn = new Random();
+        random = new Random();
 
         String username = ConfigProvider.getConfig().apiUsername();
         String password = ConfigProvider.getConfig().apiPassword();
@@ -74,9 +74,9 @@ public class BookingApiTest {
     @Description("Verify that a new booking can be created with all required fields")
     @Severity(SeverityLevel.CRITICAL)
     public void testCreateBooking() {
-        String firstName = "first" + RandomStringUtils.randomAlphabetic(3);
-        String lastName = "last" + RandomStringUtils.randomAlphabetic(3);
-        int price = rn.nextInt(3);
+        String firstName = "Create" + RandomStringUtils.randomAlphabetic(3);
+        String lastName = "Test" + RandomStringUtils.randomAlphabetic(3);
+        int price = 100 + random.nextInt(900); // Random price between 100-999
         Booking booking = TestDataBuilder.createBooking(firstName, lastName, price);
 
         BookingResponse bookingResponse = bookingHelper.createBooking(booking);
@@ -146,9 +146,9 @@ public class BookingApiTest {
     public void testUpdateBooking() {
         Integer bookingId = createAngGetBookingId();
 
-        String firstName = "first" + RandomStringUtils.randomAlphabetic(3);
-        String lastName = "last" + RandomStringUtils.randomAlphabetic(3);
-        int price = rn.nextInt(3);
+        String firstName = "Update" + RandomStringUtils.randomAlphabetic(3);
+        String lastName = "Full" + RandomStringUtils.randomAlphabetic(3);
+        int price = 200 + random.nextInt(800); // Random price between 200-999
         Booking updatedBooking = TestDataBuilder.createBooking(firstName, lastName, price);
 
         Response response = bookingHelper.updateBooking(bookingId, updatedBooking);
@@ -180,8 +180,8 @@ public class BookingApiTest {
     public void testPartialUpdateBooking() {
         Integer bookingId = createAngGetBookingId();
 
-        String firstName = "first" + RandomStringUtils.randomAlphabetic(3);
-        int price = rn.nextInt(3);
+        String firstName = "Patch" + RandomStringUtils.randomAlphabetic(3);
+        int price = 150 + random.nextInt(350); // Random price between 150-499
         Map<String, Object> partialUpdate = new HashMap<>();
         partialUpdate.put("firstname", firstName);
         partialUpdate.put("totalprice", price);
@@ -258,9 +258,9 @@ public class BookingApiTest {
     @Description("Verify that bookings can be filtered by firstname")
     @Severity(SeverityLevel.NORMAL)
     public void testGetBookingsByFirstname() {
-        String firstName = "first" + RandomStringUtils.randomAlphabetic(3);
-        String lastName = "last" + RandomStringUtils.randomAlphabetic(3);
-        int price = rn.nextInt(3);
+        String firstName = "Filter" + RandomStringUtils.randomAlphabetic(3);
+        String lastName = "First" + RandomStringUtils.randomAlphabetic(3);
+        int price = 300 + random.nextInt(700); // Random price between 300-999
         Booking booking = TestDataBuilder.createBooking(firstName, lastName, price);
         BookingResponse created = bookingHelper.createBooking(booking);
         createdBookingIds.add(created.getBookingId());
@@ -294,9 +294,9 @@ public class BookingApiTest {
     @Description("Verify that bookings can be filtered by lastname")
     @Severity(SeverityLevel.NORMAL)
     public void testGetBookingsByLastname() {
-        String firstName = "first" + RandomStringUtils.randomAlphabetic(3);
-        String lastName = "last" + RandomStringUtils.randomAlphabetic(3);
-        int price = rn.nextInt(3);
+        String firstName = "Filter" + RandomStringUtils.randomAlphabetic(3);
+        String lastName = "Last" + RandomStringUtils.randomAlphabetic(3);
+        int price = 250 + random.nextInt(750); // Random price between 250-999
         Booking booking = TestDataBuilder.createBooking(firstName, lastName, price);
         BookingResponse created = bookingHelper.createBooking(booking);
         createdBookingIds.add(created.getBookingId());
@@ -335,9 +335,9 @@ public class BookingApiTest {
     @Description("Verify that updating booking without token returns 403")
     @Severity(SeverityLevel.NORMAL)
     public void testUpdateBookingWithoutToken() {
-        String firstName = "first" + RandomStringUtils.randomAlphabetic(3);
-        String lastName = "last" + RandomStringUtils.randomAlphabetic(3);
-        int price = rn.nextInt(3);
+        String firstName = "NoAuth" + RandomStringUtils.randomAlphabetic(3);
+        String lastName = "Test" + RandomStringUtils.randomAlphabetic(3);
+        int price = 400 + random.nextInt(600); // Random price between 400-999
         Booking booking = TestDataBuilder.createDefaultBooking();
         BookingResponse created = bookingHelper.createBooking(booking);
         createdBookingIds.add(created.getBookingId());
@@ -379,7 +379,7 @@ public class BookingApiTest {
         Booking booking = Booking.builder()
                 .firstName(RandomStringUtils.randomAlphabetic(3))
                 .lastName(RandomStringUtils.randomAlphabetic(3))
-                .totalPrice(rn.nextInt(3))
+                .totalPrice(random.nextInt(3))
                 .depositPaid(true)
                 .bookingDates(validDates)
                 .additionalNeeds("None")
@@ -413,7 +413,7 @@ public class BookingApiTest {
         Booking booking = Booking.builder()
                 .firstName(RandomStringUtils.randomAlphabetic(3))
                 .lastName(RandomStringUtils.randomAlphabetic(3))
-                .totalPrice(rn.nextInt(3))
+                .totalPrice(random.nextInt(3))
                 .depositPaid(true)
                 .bookingDates(invalidDates)
                 .additionalNeeds("None")
@@ -448,7 +448,7 @@ public class BookingApiTest {
         Booking booking = Booking.builder()
                 .firstName(RandomStringUtils.randomAlphabetic(3))
                 .lastName(RandomStringUtils.randomAlphabetic(3))
-                .totalPrice(rn.nextInt(3))
+                .totalPrice(random.nextInt(3))
                 .depositPaid(true)
                 .bookingDates(sameDates)
                 .additionalNeeds("Day use")
