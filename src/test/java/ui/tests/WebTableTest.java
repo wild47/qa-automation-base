@@ -1,14 +1,12 @@
 package ui.tests;
 
 import config.ConfigProvider;
-import config.RetryExtension;
 import io.qameta.allure.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.RetryingTest;
 import ui.data.WebTableTestDataBuilder;
 import ui.pages.WebTablePage;
 
@@ -17,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Epic("UI Testing")
 @Feature("Web Tables")
 @Tag("ui")
-@ExtendWith(RetryExtension.class) // in case if we need retry policy, but currently tests are stable and don't need it
 public class WebTableTest extends BaseTest {
 
     private WebTablePage webTablePage;
@@ -30,7 +27,7 @@ public class WebTableTest extends BaseTest {
         webTablePage.open(ConfigProvider.getConfig().uiBaseUrl() + WEB_TABLES_URL);
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should add new record to table")
     @Description("Verify that a new record can be added to the web table")
     @Severity(SeverityLevel.CRITICAL)
@@ -54,7 +51,7 @@ public class WebTableTest extends BaseTest {
         webTablePage.verifyRecordData(employee.getEmail(), employee.getFirstName(), employee.getLastName());
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should edit existing record in table")
     @Description("Verify that an existing record can be edited")
     @Severity(SeverityLevel.CRITICAL)
@@ -80,7 +77,7 @@ public class WebTableTest extends BaseTest {
         webTablePage.verifyRecordData(employee.getEmail(), "Updated", employee.getLastName());
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should delete record from table")
     @Description("Verify that a record can be deleted from the web table")
     @Severity(SeverityLevel.CRITICAL)
@@ -108,7 +105,7 @@ public class WebTableTest extends BaseTest {
                 .isTrue();
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should search for records in table")
     @Description("Verify that table search functionality works correctly")
     @Severity(SeverityLevel.NORMAL)
@@ -142,7 +139,7 @@ public class WebTableTest extends BaseTest {
                 .isGreaterThan(1);
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should handle search with no results")
     @Description("Verify that search returns empty results when no match is found")
     @Severity(SeverityLevel.NORMAL)
@@ -154,7 +151,7 @@ public class WebTableTest extends BaseTest {
         webTablePage.verifySearchResultsCount(0);
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should handle multiple record operations")
     @Description("Verify that multiple add, edit, and delete operations work correctly")
     @Severity(SeverityLevel.NORMAL)
@@ -203,7 +200,7 @@ public class WebTableTest extends BaseTest {
                 .isTrue();
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should add complete record successfully")
     @Description("Verify that form accepts all fields")
     @Severity(SeverityLevel.MINOR)

@@ -128,35 +128,90 @@ junit.jupiter.execution.parallel.config.fixed.parallelism=4
 
 ### Retry Policy
 
-**Configuration:** Failed tests automatically retry based on `test.retry.count` setting.
+**Implementation:** UI tests use JUnit Pioneer's `@RetryingTest` annotation for automatic retry on failure.
 
-#### Change Retry Count
-```bash
-  # Retry failed tests 2 times (3 total attempts)
-  mvn test -Dtest.retry.count=2
-
-  # Retry failed tests once (2 total attempts)
-  mvn test -Dtest.retry.count=1
-
-  # Disable retries
-  mvn test -Dtest.retry.count=0
-```
-
-#### Enable Retry for Specific Tests
-To enable retry functionality, add `@ExtendWith(RetryExtension.class)` to your test class:
+UI tests are configured to retry up to **3 times** to handle flaky tests caused by timing issues:
 
 ```java
-@ExtendWith(RetryExtension.class)
-@Tag("api")
-public class BookingApiTest {
-    // Tests will retry on failure
+@RetryingTest(3)
+@DisplayName("Should submit student registration form successfully")
+public void testCompleteFormSubmission() {
+    // Test implementation
 }
 ```
+
+**Benefits:**
+- Automatically retries failed tests up to 3 attempts
+- Reduces false failures from timing/synchronization issues
+- No custom extension code needed
+- Clear visibility in test reports
 
 ### Headless Mode (for CI/CD)
 ```bash
   mvn test -Dui.headless=true
 ```
+
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions Workflow
+
+The framework includes a complete GitHub Actions workflow (`.github/workflows/test-automation.yml`) that:
+
+#### Triggers
+- **Push**: Automatically runs on push to master/main/develop branches
+- **Pull Requests**: Validates PRs before merging
+- **Scheduled**: Daily runs at 2 AM UTC for regression testing
+- **Manual**: Can be triggered manually via GitHub Actions UI
+
+#### Test Execution Strategy
+The workflow runs tests in two modes:
+
+1. **Parallel Test Suites** (Matrix Strategy)
+   - API Tests (`@Tag("api")`)
+   - UI Tests (`@Tag("ui")`)
+   - Integration Tests (`@Tag("integration")`)
+   - Each suite runs independently in parallel
+
+2. **Complete Test Suite**
+   - All tests run together with 4 parallel threads
+   - Comprehensive regression validation
+
+#### Features
+- ✅ **Java 21** with Maven dependency caching
+- ✅ **Chrome Browser** automatically installed for UI tests
+- ✅ **Headless Mode** enabled for UI tests in CI
+- ✅ **Allure Reports** automatically generated and published to GitHub Pages
+- ✅ **Test History** tracks last 20 test runs
+- ✅ **Artifacts** - Test results and screenshots uploaded for 30 days
+- ✅ **Screenshot Capture** on UI test failures (retained for 7 days)
+- ✅ **Continue on Failure** - Reports generated even when tests fail
+
+#### Allure Reports on GitHub Pages
+
+After the workflow runs, Allure reports are published to:
+- **API Tests**: `https://yourusername.github.io/qa-automation-assignment/api/`
+- **UI Tests**: `https://yourusername.github.io/qa-automation-assignment/ui/`
+- **Integration Tests**: `https://yourusername.github.io/qa-automation-assignment/integration/`
+- **All Tests**: `https://yourusername.github.io/qa-automation-assignment/all-tests/`
+
+#### Setup Instructions
+1. **Enable GitHub Pages**:
+   - Go to Settings → Pages
+   - Set Source to `gh-pages` branch
+   - Save changes
+
+2. **Push Workflow**:
+   ```bash
+   git add .github/workflows/test-automation.yml
+   git commit -m "Add CI/CD pipeline with GitHub Actions"
+   git push origin master
+   ```
+
+3. **View Results**:
+   - Go to Actions tab in your GitHub repository
+   - Click on the latest workflow run
+   - View test results and download artifacts
+   - Access Allure reports via GitHub Pages URL
 
 ## 📊 Allure Reports
 
@@ -260,6 +315,7 @@ Then open: `target/allure-report/index.html`
 - **Java 21** - Programming language
 - **Maven** - Build & dependency management
 - **JUnit 5** - Test framework
+- **JUnit Pioneer** - Extended testing features (retry policy)
 
 ### API Testing
 - **RestAssured** - API testing library
@@ -275,6 +331,10 @@ Then open: `target/allure-report/index.html`
 - **Lombok** - Reduce boilerplate code
 - **Owner** - Configuration management
 - **Apache Commons Lang3** - Utility functions
+
+### CI/CD
+- **GitHub Actions** - Automated CI/CD pipeline
+- **GitHub Pages** - Allure report hosting
 
 ### Test Data & Patterns
 - **Builder Pattern** with Lombok
@@ -304,7 +364,7 @@ Then open: `target/allure-report/index.html`
 #### 2. **Reliability**
    - Automatic cleanup after each test
    - Thread-safe parallel execution
-   - Retry policy for flaky tests
+   - Retry policy for flaky UI tests (JUnit Pioneer @RetryingTest)
    - Unique test data generation
    - Proper wait strategies in UI tests
 
@@ -322,10 +382,12 @@ Then open: `target/allure-report/index.html`
    - Schema validation for API responses
 
 #### 5. **CI/CD Ready**
-   - Headless mode support
+   - GitHub Actions workflow with matrix strategy
+   - Headless mode support for UI tests
    - Configurable parallel execution
-   - Exit codes for build systems
-   - Allure report generation
+   - Automatic Allure report publishing to GitHub Pages
+   - Test artifacts and screenshot retention
+   - Scheduled daily regression runs
    - No hardcoded dependencies
 
 ## 🚧 Challenges & Solutions
@@ -431,18 +493,17 @@ Then open: `target/allure-report/index.html`
    - API mock server for offline testing
    - Database containers for integration tests
 
-4. **CI/CD Pipeline**
-   - GitHub Actions / Jenkins pipeline configuration
-   - Scheduled test execution (nightly builds)
+4. **Enhanced CI/CD**
    - Slack/Email notifications for test results
-   - Automatic Allure report publishing
-   - Pull request validation gates
+   - Teamcity pipeline as alternative to GitHub Actions
+   - Deployment to multiple environments (dev, staging, prod)
+   - Integration with Jira for test case management
 
 5. **Advanced Retry Logic**
    - Conditional retry (only for specific exceptions)
    - Exponential backoff for API retries
-   - Retry only flaky tests (not actual bugs)
    - Retry analytics and reporting
+   - Apply retry to API tests where appropriate
 
 6. **Logging & Debugging**
    - Structured logging with Log4j2

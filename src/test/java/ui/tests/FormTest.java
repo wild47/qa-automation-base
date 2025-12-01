@@ -1,14 +1,12 @@
 package ui.tests;
 
 import config.ConfigProvider;
-import config.RetryExtension;
 import io.qameta.allure.*;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.RetryingTest;
 import ui.data.FormTestDataBuilder;
 import ui.pages.FormPage;
 
@@ -19,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Epic("UI Testing")
 @Feature("Form")
 @Tag("ui")
-@ExtendWith(RetryExtension.class) // in case if we need retry policy, but currently tests are stable and don't need it
 public class FormTest extends BaseTest {
 
     private FormPage formPage;
@@ -33,7 +30,7 @@ public class FormTest extends BaseTest {
         formPage.open(ConfigProvider.getConfig().uiBaseUrl() + FORM_URL);
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should submit student registration form successfully")
     @Description("Verify that student registration form can be filled and submitted with all fields")
     @Severity(SeverityLevel.CRITICAL)
@@ -69,7 +66,7 @@ public class FormTest extends BaseTest {
                 .isTrue();
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should submit form with required fields only")
     @Description("Verify that form can be submitted with only required fields")
     @Severity(SeverityLevel.NORMAL)
@@ -94,7 +91,7 @@ public class FormTest extends BaseTest {
                 .isTrue();
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should handle date picker selection")
     @Description("Verify that date of birth can be selected from date picker")
     @Severity(SeverityLevel.NORMAL)
@@ -119,7 +116,7 @@ public class FormTest extends BaseTest {
                 .isTrue();
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should handle subject selection with autocomplete")
     @Description("Verify that subjects can be selected using autocomplete dropdown")
     @Severity(SeverityLevel.NORMAL)
@@ -144,7 +141,7 @@ public class FormTest extends BaseTest {
                 .isTrue();
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should handle state and city dropdown selection")
     @Description("Verify that state and city can be selected from dependent dropdowns")
     @Severity(SeverityLevel.NORMAL)
