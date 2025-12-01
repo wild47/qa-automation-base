@@ -1,12 +1,14 @@
 package ui.tests;
 
 import config.ConfigProvider;
+import config.RetryExtension;
 import io.qameta.allure.*;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import ui.data.FormTestDataBuilder;
 import ui.pages.FormPage;
 
@@ -17,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Epic("UI Testing")
 @Feature("Form")
 @Tag("ui")
+@ExtendWith(RetryExtension.class) // in case if we need retry policy, but currently tests are stable and don't need it
 public class FormTest extends BaseTest {
 
     private FormPage formPage;
