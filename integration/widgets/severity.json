@@ -1,1 +1,1 @@
-[]
+[{"uid":"68dbe9ff420f6edf","name":"Should update booking via API and reflect changes in Web Table","time":{"start":1765163717443,"stop":1765163748468,"duration":31025},"status":"passed","severity":"normal"},{"uid":"77d286aa8d93aeff","name":"Should create booking via API and add to Web Table via UI","time":{"start":1765163748532,"stop":1765163753819,"duration":5287},"status":"passed","severity":"critical"}]
