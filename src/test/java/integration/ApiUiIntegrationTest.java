@@ -9,6 +9,7 @@ import config.ConfigProvider;
 import io.qameta.allure.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
+import org.junitpioneer.jupiter.RetryingTest;
 import ui.pages.WebTablePage;
 import ui.tests.BaseTest;
 
@@ -56,7 +57,7 @@ public class ApiUiIntegrationTest extends BaseTest {
         super.tearDown();
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should create booking via API and add to Web Table via UI")
     @Description("Integration test: Create booking through API, then use that data to populate Web Table in UI")
     @Severity(SeverityLevel.CRITICAL)
@@ -97,7 +98,7 @@ public class ApiUiIntegrationTest extends BaseTest {
         webTablePage.verifyRecordData(email, apiBooking.getFirstName(), apiBooking.getLastName());
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should sync multiple API bookings to Web Table")
     @Description("Integration test: Create multiple bookings via API and sync them all to Web Table UI")
     @Severity(SeverityLevel.NORMAL)
@@ -157,7 +158,7 @@ public class ApiUiIntegrationTest extends BaseTest {
         webTablePage.verifyRecordData(email2, booking2.getFirstName(), booking2.getLastName());
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should update booking via API and reflect changes in Web Table")
     @Description("Integration test: Create booking via API, add to UI, update via API, then verify UI can be updated too")
     @Severity(SeverityLevel.NORMAL)
@@ -201,7 +202,7 @@ public class ApiUiIntegrationTest extends BaseTest {
         webTablePage.verifyRecordData(email, updatedBooking.getFirstName(), updatedBooking.getLastName());
     }
 
-    @Test
+    @RetryingTest(3)
     @DisplayName("Should search Web Table using API booking data")
     @Description("Integration test: Create booking via API, add to UI, then search for it using API data")
     @Severity(SeverityLevel.MINOR)

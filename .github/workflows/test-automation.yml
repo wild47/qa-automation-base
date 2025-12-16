@@ -50,9 +50,9 @@ jobs:
           chrome-version: stable
 
       - name: Run ${{ matrix.test-suite.name }}
-        run: mvn clean test -Dgroups=${{ matrix.test-suite.tag }} -Dui.headless=true -Dui.timeout=30000 -Dselenide.pageLoadTimeout=30000
+        run: mvn clean test -Dgroups=${{ matrix.test-suite.tag }} -Dui.headless=true -Dui.timeout=30000 -Dselenide.pageLoadTimeout=30000 -Dtest.parallel.enabled=false
         continue-on-error: true
-        timeout-minutes: 3
+        timeout-minutes: 5
 
       - name: Get Allure history
         if: always()

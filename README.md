@@ -164,17 +164,24 @@ The framework includes a complete GitHub Actions workflow (`.github/workflows/te
 - **Manual**: Can be triggered manually via GitHub Actions UI
 
 #### Test Execution Strategy
-The workflow runs tests in two modes:
+The workflow runs all test suites in parallel with retry policies:
 
-1. **Parallel Test Suites** (Matrix Strategy)
-   - API Tests (`@Tag("api")`)
-   - UI Tests (`@Tag("ui")`)
-   - Integration Tests (`@Tag("integration")`)
-   - Each suite runs independently in parallel
+1. **API Tests** (`@Tag("api")`)
+   - 18 tests covering authentication, booking CRUD, validation
+   - Fast and reliable (~1-2 minutes)
+   - No retry needed (stable API endpoint)
 
-2. **Complete Test Suite**
-   - All tests run together with 4 parallel threads
-   - Comprehensive regression validation
+2. **UI Tests** (`@Tag("ui")`)
+   - 13 tests with `@RetryingTest(3)` annotation
+   - Automatically retries up to 3 times on failure
+   - Parallel execution disabled in CI (`-Dtest.parallel.enabled=false`)
+   - 5-minute timeout per test suite
+
+3. **Integration Tests** (`@Tag("integration")`)
+   - 4 tests with `@RetryingTest(3)` annotation
+   - Combines API + UI workflows
+   - Automatically retries up to 3 times on failure
+   - Parallel execution disabled in CI
 
 #### Features
 - ✅ **Java 21** with Maven dependency caching
@@ -192,7 +199,8 @@ After the workflow runs, Allure reports are published to:
 - **API Tests**: `https://yourusername.github.io/qa-automation-assignment/api/`
 - **UI Tests**: `https://yourusername.github.io/qa-automation-assignment/ui/`
 - **Integration Tests**: `https://yourusername.github.io/qa-automation-assignment/integration/`
-- **All Tests**: `https://yourusername.github.io/qa-automation-assignment/all-tests/`
+
+**Note**: UI and Integration tests may show failures if demoqa.com is slow/unavailable. The retry mechanism (`@RetryingTest(3)`) helps mitigate flakiness, but third-party site reliability is outside our control.
 
 #### Setup Instructions
 1. **Enable GitHub Pages**:
@@ -441,6 +449,17 @@ Then open: `target/allure-report/index.html`
 - Kept only Java-accessed values in config.properties
 - Used junit-platform.properties only for JUnit-specific settings
 - Eliminated redundant configuration entries
+
+### Challenge 7: Third-Party Test Site Unreliability in CI
+**Problem**: UI and Integration tests pass locally but are flaky in GitHub Actions CI due to demoqa.com variability.
+
+**Solution**:
+- Added `@RetryingTest(3)` to all UI and Integration tests
+- Disabled parallel execution for UI tests in CI (`-Dtest.parallel.enabled=false`)
+- Increased timeout from 3 to 5 minutes
+- Tests retry up to 3 times automatically on failure
+- This mitigates most flakiness, though demoqa.com downtime may still cause failures
+- For production use, would replace demoqa.com with internal test environment or mock server
 
 ## ✨ What I Would Add With More Time
 

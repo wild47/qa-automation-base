@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn test:*)",
+      "Bash(mvn clean test:*)",
+      "Bash(mvn clean compile test-compile:*)",
+      "Bash(mvn allure:report:*)",
+      "Bash(mvn.cmd clean test:*)",
+      "Bash(where:*)",
+      "Bash(java -version:*)",
+      "Bash(dir mvnw*)",
+      "Bash(mkdir:*)",
+      "Bash(git mv:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(git --version)",
+      "Bash(git filter-branch:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
