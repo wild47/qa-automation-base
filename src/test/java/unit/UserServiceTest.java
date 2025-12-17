@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 @Feature("User Service")
 @DisplayName("User Service Unit Tests")
 @Tag("unit")
-class UserServiceTest {
+public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
