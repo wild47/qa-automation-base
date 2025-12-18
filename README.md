@@ -22,6 +22,7 @@ qa-automation-assignment/
 │       │   └── tests/        # UI test classes
 │       ├── unit/             # Unit tests with Mockito
 │       ├── reflection/       # Reflection API tests
+│       ├── contract/         # PACT contract tests
 │       └── config/           # Configuration management
 └── src/test/resources/
     ├── config.properties     # Test configuration
@@ -61,6 +62,10 @@ qa-automation-assignment/
   # Reflection tests
   mvn test -Dtest=ClassStructureValidationTest
   mvn test -Dtest=PrivateMemberAccessTest
+
+  # Contract tests
+  mvn test -Dtest=BookingApiConsumerTest
+  mvn test -Dtest=AuthenticationApiConsumerTest
 ```
 
 ### Run Tests by Tag
@@ -79,6 +84,9 @@ qa-automation-assignment/
 
   # Run only reflection tests
   mvn test -Dgroups=reflection
+
+  # Run only contract tests
+  mvn test -Dgroups=contract
 ```
 
 ## ⚙️ Configuration
@@ -375,7 +383,21 @@ Then open: `target/allure-report/index.html`
 
 **Total Reflection Tests**: 19
 
-### **Grand Total: 60 Tests**
+### Contract Tests (`contract`)
+**Target**: Consumer-driven contract testing with PACT
+
+#### Booking API Consumer Contracts
+- ✅ Create booking contract
+- ✅ Get booking by ID contract
+- ✅ Get all bookings contract
+- ✅ Update booking contract
+- ✅ Delete booking contract
+
+**Total Contract Tests**: 8 (consumer tests only)
+
+**Note**: These are PACT consumer contract tests that define API expectations and generate contract files (pact files). Tests run against mock providers created by the PACT framework. Provider verification tests would typically run against your own API service in a real project.
+
+### **Grand Total: 68 Tests**
 
 ## 🛠️ Technologies & Frameworks
 
@@ -388,8 +410,9 @@ Then open: `target/allure-report/index.html`
 
 ### API Testing
 - **RestAssured** - API testing library
-- **Jackson** - JSON serialization/deserialization
+- **Jackson** - JSON serialization/deserialization (also used for DTO parsing tests)
 - **JSON Schema Validator** - Schema validation
+- **PACT** - Consumer-driven contract testing
 
 ### UI Testing
 - **Selenide** - Simplified Selenium wrapper
@@ -411,10 +434,52 @@ Then open: `target/allure-report/index.html`
 - **Step Pattern** for API tests with Allure
 - **Test Data Builders** for data generation
 
+## 🤝 PACT Contract Testing
+
+### What is PACT?
+PACT is a consumer-driven contract testing framework that ensures API consumers and providers maintain compatible contracts.
+
+### How It Works
+1. **Consumer Tests** define expectations and generate pact files
+2. Tests run against mock providers created by PACT framework
+3. Pact files document the contract between consumer and provider
+4. In a real project, provider tests would verify the actual API matches contracts
+
+### Benefits
+- Early detection of breaking changes
+- Independent service development
+- Living documentation of API contracts
+- Reduced integration issues
+- Faster feedback than end-to-end tests
+
+### Running Contract Tests
+
+```bash
+# Run all consumer contract tests
+mvn test -Dgroups=contract
+
+# Run specific consumer test
+mvn test -Dtest=BookingApiConsumerTest
+mvn test -Dtest=AuthenticationApiConsumerTest
+```
+
+Consumer tests will:
+- Run against mock providers on ports 8888 and 8889
+- Generate pact files in `target/pacts/` directory
+- Validate consumer expectations
+- Document API contract requirements
+
+### Pact Files
+Generated pact files contain:
+- Consumer and provider names
+- Request/response expectations
+- Matchers for flexible validation
+- Provider states for setup
+
 ## 📋 Test Strategy
 
 ### Approach
-1. **Layered Testing**: Separate API, UI, Integration, Unit, and Reflection test layers for maintainability
+1. **Layered Testing**: Separate API, UI, Integration, Unit, Reflection, and Contract test layers for maintainability
 2. **Data Isolation**: Each test creates unique data to prevent conflicts in parallel execution
 3. **Automatic Cleanup**: `@AfterEach` hooks ensure test data is cleaned up
 4. **Thread Safety**: ThreadLocal for token storage, per-method test instances
@@ -422,6 +487,7 @@ Then open: `target/allure-report/index.html`
 6. **Comprehensive Coverage**: CRUD operations, validation, error handling, edge cases, architectural validation
 7. **Unit Testing**: Mock external dependencies with Mockito for isolated business logic testing
 8. **Reflection API**: Validate class structures, enforce architectural rules, and test internal implementation
+9. **Contract Testing**: Consumer-driven contracts with PACT for API compatibility validation
 
 ### What I Prioritized
 
