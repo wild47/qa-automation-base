@@ -1,0 +1,2 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Wed Dec 24 03:17:44 UTC 2025","Wed Dec 24 03:17:57 UTC 2025","12317","","ui.tests.FormTest","","ui.tests.FormTest","testDatePickerSelection","Should handle date picker selection [1]","Verify that date of birth can be selected from date picker"

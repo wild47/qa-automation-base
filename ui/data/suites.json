@@ -1,1 +1,1 @@
-{"uid":"98d3104e051c652961429bf95fa0b5d6","name":"suites","children":[]}
+{"uid":"98d3104e051c652961429bf95fa0b5d6","name":"suites","children":[{"name":"ui.tests.FormTest","children":[{"name":"Should handle date picker selection [1]","uid":"a0b68019c623b4f9","parentUid":"e76c8794bd55b6ab57353c1e7c22f425","status":"passed","time":{"start":1766546264963,"stop":1766546277280,"duration":12317},"flaky":false,"newFailed":false,"newPassed":false,"newBroken":false,"retriesCount":0,"retriesStatusChange":false,"parameters":[],"tags":["ui"]}],"uid":"e76c8794bd55b6ab57353c1e7c22f425"}]}
